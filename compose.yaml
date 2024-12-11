@@ -1,0 +1,42 @@
+version: '3'
+services:
+  maven:
+    ports:
+      - "8081:8081"
+    image: maven:latest
+    command: bash -c "mvn clean install && mvn spring-boot:run"
+    volumes:
+      - .:/myapp/app
+      - $HOME/.m2:/root/.m2
+    working_dir: /myapp/app
+    stdin_open: true
+    tty: true
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - db-postgres
+    networks:
+      - backend
+
+  db-postgres:
+    image: postgres:14.2
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: 'postgres'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+      - ./dbroot:/root
+      - ./dbroot/pssqldump.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/db.sql
+    networks:
+      - backend
+
+networks:
+  backend: {}

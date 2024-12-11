@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+.container {
+    width: 300px;
+    margin: 100px auto 0;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.register-form {
+    background-color: #fff;
+    padding: 20px;
+    border: 2px solid #00a000; /* Green border */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+.register-form label {
+    display: block;
+    width: 100%; /* Ширина метки на всю ширину контейнера */
+    margin-bottom: 5px; /* Отступ снизу метки */
+}
+
+.register-form label span {
+    display: inline-block;
+    width: 100px; /* Фиксированная ширина метки */
+    text-align: right; /* Выравнивание текста метки по правому краю */
+    margin-right: 10px; /* Отступ справа между меткой и полем ввода */
+}
+
+
+.register-form input[type="text"],
+.register-form input[type="password"],
+.register-form input[type="number"] {
+    width: calc(100% - 110px);
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.register-form button[type="submit"] {
+    background: linear-gradient(to right, #00a000, #00c000); /* Gradient button */
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.register-form button[type="submit"]:hover {
+    background: linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(69, 143, 49, 1) 50%, rgba(76, 175, 80, 1) 100%);
+}

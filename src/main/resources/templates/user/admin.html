@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Админ-панель</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.10.21/i18n/Russian.json"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .modal-body .form-group {
+            margin-bottom: 10px;
+        }
+        .modal-footer {
+            justify-content: space-between;
+        }
+        .right-float {
+            float: right;
+        }
+        #togglePassword {
+
+            background-size: 20px; /* Размер иконки */
+            background-repeat: no-repeat; /* Запрет повторения фона */
+            background-position: center; /* Позиция иконки в центре кнопки */
+            padding: 8px; /* Внутренние отступы для обеспечения места под иконку */
+            border: 1px solid #ccc; /* Граница */
+            border-radius: 4px; /* Закругление углов */
+            cursor: pointer; /* Изменение курсора при наведении */
+        }
+        /* Custom CSS for the header fragment */
+        .custom-header {
+            background-color: #333;
+            color: #df0e0e;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        h2 {
+            text-align: center;
+        }
+        #usersTable, #accsTable {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        #usersTable th, #usersTable td, #accountsTable th, #accountsTable td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            white-space: nowrap;
+        }
+        #usersTable th, #accountsTable th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #usersTable tbody tr:nth-child(even), #accountsTable tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #usersTable tbody tr:hover, #accountsTable tbody tr:hover {
+            background-color: #ddd;
+        }
+        .edit-btn, .delete-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-btn {
+            background-color: #f44336;
+        }
+        .edit-btn:hover, .delete-btn:hover {
+            opacity: 0.8;
+        }
+
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #userForm div {
+            margin-bottom: 10px;
+        }
+        #userForm label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #userForm input[type="text"],
+        #userForm input[type="number"],
+        #userForm input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+
+        /* Additional CSS for password column */
+        #usersTable td.password-col {
+            max-width: 150px; /* Adjust as needed */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #usersTable {
+            display: none;
+        }
+
+        #accountsTable {
+            display: none;
+        }
+
+        #rolesTable {
+            display: none;
+        }
+
+        #transactionsTable {
+            display: none;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #007BFF;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #status {
+            margin-top: 10px;
+            color: green;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .right-float {
+            float: right;
+        }
+        .button-container > div {
+            flex: 1;
+            text-align: center;
+        }
+        .button-container > div:first-child {
+            text-align: left;
+        }
+        .button-container > div:last-child {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Информация о пользователе и счет -->
+    <div class="card">
+        <div class="card-header">
+            Ваша информация
+        </div>
+        <div class="card-body">
+            <form id="userForm">
+                <div class="form-group">
+                    <label for="username">Логин:</label>
+                    <input id="username" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="firstName">Имя:</label>
+                    <input id="firstName" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Фамилия:</label>
+                    <input id="lastName" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="middleName">Отчество:</label>
+                    <input id="middleName" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="email">Эл. почта:</label>
+                    <input id="email" type="email" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="phonenumber">Номер телефона:</label>
+                    <input id="phonenumber" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="age">Возраст:</label>
+                    <input id="age" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="address">Адресс:</label>
+                    <input id="address" type="email" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <div class="input-group">
+                        <input id="password" type="password" class="form-control" placeholder="Введите пароль" aria-label="Password" aria-describedby="togglePassword">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="editProfileBtn" class="btn btn-primary right-float">Редактировать</button>
+                <button type="button" id="saveProfileBtn" class="btn btn-success right-float" style="display: none;">Сохранить</button>
+            </form>
+            <div th:insert="~{fragment::header}"></div>
+
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования профиля -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Редактировать профиль</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="form-group">
+                            <label for="editusername">Логин:</label>
+                            <input id="editusername" type="text" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editfirstName">Имя:</label>
+                            <input id="editfirstName" type="text" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editlastName">Фамилия:</label>
+                            <input id="editlastName" type="text" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editmiddleName">Отчество:</label>
+                            <input id="editmiddleName" type="text" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editemail">Эл. почта:</label>
+                            <input id="editemail" type="email" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editphonenumber">Номер телефона:</label>
+                            <input id="editphonenumber" type="text" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editage">Возраст:</label>
+                            <input id="editage" type="text" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editaddress">Адресс:</label>
+                            <input id="editaddress" type="email" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <label for="editpassword">Пароль:</label>
+                            <div class="input-group">
+                                <input id="editpassword" type="password" class="form-control" placeholder="Введите пароль" aria-label="Password" aria-describedby="togglePassword">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="edittogglePassword">
+                                        <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" id="saveProfileChangesBtn" class="btn btn-primary">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <h1>Создать отчёт о пользователях</h1>
+    <div>
+        <button id="create-excel-btn">Excel</button>
+        <p id="status"></p>
+    </div>
+
+    <div>
+        <button id="create-word-btn">Word</button>
+        <p id="status1"></p>
+    </div>
+</div>
+
+<!-- Кнопки или элементы для переключения таблиц -->
+<div id="tableSwitch">
+    <button id="btnUsers">Пользователи</button>
+    <!--    <button id="btnRoles">Роли</button>-->
+    <!--    <button id="btnKeys">Ключи</button>-->
+</div>
+
+<table id="usersTable" class="display">
+    <thead>
+    <tr>
+        <th>Логин</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Возраст</th>
+        <th>Номер телефона</th>
+        <th>Адрес</th>
+        <th>Отчество</th>
+        <th>Эл. почта</th>
+        <th>Пароль</th>
+        <th>Доступ</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}" th:data-id="${user.id}">
+        <td th:text="${user.username}">Логин</td>
+        <td th:text="${user.firstName}">Имя</td>
+        <td th:text="${user.lastName}">Фамилия</td>
+        <td th:text="${user.age}">Возраст</td>
+        <td th:text="${user.phoneNumber}">Номер телефона</td>
+        <td th:text="${user.address}">Адрес</td>
+        <td th:text="${user.middleName}">Отчество</td>
+        <td th:text="${user.email}">Эл. почта</td>
+        <td th:text="${user.password}" class="password-col">Пароль</td>
+        <td th:text="${user.roles}">Доступ</td>
+        <td>
+            <button class="edit-btn" data-id="${user.id}">Изменить</button>
+            <button class="delete-btn" data-id="${user.id}">Удалить</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!-- Модальное окно -->
+<div id="editModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Редактировать доступ пользователя</h2>
+        <form id="editForm">
+            <p>
+                <label>
+                    <input type="radio" name="role" value="USER" id="roleUser"> Пользователь
+                </label>
+            </p>
+            <p>
+                <label>
+                    <input type="radio" name="role" value="ADMIN" id="roleAdmin"> Администратор
+                </label>
+            </p>
+            <input type="hidden" id="editUserId">
+            <button type="button" id="saveChanges">Сохранить изменения</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Находим кнопку "Редактировать профиль" по ее идентификатору
+        $('#editProfileBtn').click(function () {
+            // При клике показываем модальное окно с идентификатором editProfileModal
+            $('#editProfileModal').modal('show');
+        });
+
+        // Функция скрытия пароля в модальном окне
+        $('#edittogglePassword').click(function() {
+            var passwordField = $('#editpassword');
+            var icon = $(this).find('i');
+
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        });
+
+        // Функция скрытия пароля в профиле
+        $('#togglePassword').click(function() {
+            var passwordField = $('#password');
+            var icon = $(this).find('i');
+
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        });
+
+        // Функция загрузки данных в модальное окно при клике на кнопку "Редактировать профиль"
+        $('#editProfileBtn').click(function() {
+            const userId = getParameterByName('userId');
+            if (userId) {
+                const url = `/users/api/users/${userId}`;  // Формируем URL запроса
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(response) {
+                        console.log('Успешно получены данные пользователя:', response);
+                        // Заполняем поля формы данными пользователя
+                        $('#editusername').val(response.username);
+                        $('#editfirstName').val(response.firstName);
+                        $('#editlastName').val(response.lastName);
+                        $('#editmiddleName').val(response.middleName);
+                        $('#editemail').val(response.email);
+                        $('#editphonenumber').val(response.phoneNumber);
+                        $('#editage').val(response.age);
+                        $('#editaddress').val(response.address);
+                        $('#editpassword').val(response.password);
+                        // Устанавливаем ID пользователя в атрибут data-id кнопки "Сохранить"
+                        $('#saveProfileChangesBtn').attr('data-id', response.id);
+                    },
+                    error: function(error) {
+                        console.error('Ошибка при получении данных пользователя:', error);
+                        alert('Ошибка при получении данных пользователя');
+                    }
+                });
+            } else {
+                console.error('userId не найден в URL');
+                alert('userId не найден в URL');
+            }
+        });
+
+        // Обработчик клика по кнопке "Сохранить" в модальном окне
+        $('#saveProfileChangesBtn').click(function() {
+            // Получаем данные из формы
+            var username = $('#editusername').val();
+            var firstName = $('#editfirstName').val();
+            var lastName = $('#editlastName').val();
+            var email = $('#editemail').val();
+            var middlename = $('#editmiddleName').val();
+            var phonenumber = $('#editphonenumber').val();
+            var age = $('#editage').val();
+            var address = $('#editaddress').val();
+            var password = $('#editpassword').val();
+            // Получаем ID пользователя из атрибута data-id кнопки
+            var userId = $(this).attr('data-id');
+            // Формируем объект с данными для отправки на сервер
+            var userData = {
+                id: userId,
+                username: username,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                middleName: middlename,
+                phoneNumber: phonenumber,
+                age: age,
+                address: address,
+                password: password
+            };
+            // Отправляем AJAX запрос на сервер для сохранения изменений
+            $.ajax({
+                type: 'PUT', // Метод запроса (может быть и POST в зависимости от вашей логики на сервере)
+                url: '/users/api/user/put/' + userId, // URL вашего API
+                contentType: 'application/json', // Тип данных, отправляемых на сервер
+                data: JSON.stringify(userData), // Преобразуем данные в JSON
+                success: function(response) {
+                    // Обработка успешного ответа от сервера (например, обновление интерфейса)
+                    console.log('Профиль успешно обновлен', response);
+                    $('#editProfileModal').modal('hide'); // Закрываем модальное окно после успешного сохранения
+                    // Дополнительные действия при необходимости
+                    location.reload(); // Перезагружаем страницу, чтобы увидеть изменения
+                },
+                error: function(xhr, status, error) {
+                    // Обработка ошибки (например, вывод сообщения об ошибке)
+                    console.error('Ошибка при сохранении профиля', error);
+                    // Дополнительные действия при необходимости
+                }
+            });
+        });
+
+        // Загрузка информации о пользователе в профиль
+        const userId = getParameterByName('userId');
+        if (userId) {
+            const url = `/users/api/users/${userId}`;  // Формируем URL запроса
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    console.log('Успешно получены данные пользователя:', response);
+                    // Заполняем поля формы данными пользователя
+                    $('#username').val(response.username);
+                    $('#firstName').val(response.firstName);
+                    $('#lastName').val(response.lastName);
+                    $('#middleName').val(response.middleName);
+                    $('#email').val(response.email);
+                    $('#phonenumber').val(response.phoneNumber);
+                    $('#age').val(response.age);
+                    $('#address').val(response.address);
+                    $('#password').val(response.password);
+                    if (response.account) {
+                        $('#accountSection').show();
+                        $('#createAccountSection').hide();
+                        $('.account-info').text(`Номер счета: ${response.account.number}, Баланс: ${response.account.balance}`);
+                    } else {
+                        $('#accountSection').hide();
+                        $('#createAccountSection').show();
+                    }
+                },
+                error: function(error) {
+                    console.error('Ошибка при получении данных пользователя:', error);
+                    alert('Ошибка при получении данных пользователя');
+                }
+            });
+        } else {
+            console.error('userId не найден в URL');
+            alert('userId не найден в URL');
+        }
+    });
+
+    // Функция чтобы доставать userId из URL
+    function getParameterByName(name) {
+        const url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+    // функция создания документа WORD
+    document.addEventListener('DOMContentLoaded', function() {
+        const createWordBtn = document.getElementById('create-word-btn');
+        const statusText = document.getElementById('status');
+        createWordBtn.addEventListener('click', function() {
+            statusText.textContent = 'Creating document...';
+            fetch('/word/create-word', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'document.docx';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    statusText.textContent = 'Document created successfully!';
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    statusText.textContent = 'An error occurred while creating the document.';
+                });
+        });
+    });
+    // функция создания документа EXCEL
+    document.addEventListener('DOMContentLoaded', function() {
+        const createExcelBtn = document.getElementById('create-excel-btn');
+        const statusText = document.getElementById('status');
+        createExcelBtn.addEventListener('click', function() {
+            fetch('/api/create-excel')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'document.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    statusText.textContent = 'Excel document has been created and downloaded.';
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    statusText.textContent = 'Failed to create Excel document.';
+                    statusText.style.color = 'red';
+                });
+        });
+    });
+    $(document).ready(function() {
+
+        // Обработчик события клика для кнопки редактирования
+        $('.edit-btn').on('click', function () {
+            var userId = $(this).closest('tr').data('id'); // Получаем userId из атрибута data-id строки таблицы
+            var currentRole = $(this).closest('tr').find('td:contains("ADMIN"), td:contains("USER")').text(); // Получаем текущую роль пользователя
+
+            console.log('Attempting to edit user with ID:', userId); // Отладочная информация
+
+            if (!userId) {
+                console.error('No user ID found in data attribute');
+                return;
+            }
+
+            // Устанавливаем значения в модальное окно
+            $('#editUserId').val(userId);
+            if (currentRole.trim() === 'ADMIN') {
+                $('#roleAdmin').prop('checked', true);
+            } else {
+                $('#roleUser').prop('checked', true);
+            }
+
+            // Открываем модальное окно
+            $('#editModal').fadeIn();
+        });
+
+        // Закрытие модального окна при нажатии на крестик
+        $('.close').on('click', function () {
+            $('#editModal').fadeOut();
+        });
+
+        // Обработчик для кнопки "Сохранить изменения"
+        $('#saveChanges').on('click', function () {
+            var userId = $('#editUserId').val();
+            var selectedRole = $('input[name="role"]:checked').val();
+
+            console.log('Saving changes for user with ID:', userId, 'New Role:', selectedRole); // Отладочная информация
+
+            $.ajax({
+                url: '/admin/edit/' + userId,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({roles: selectedRole}),
+                success: function () {
+                    console.log('User updated successfully');
+                    $('#editModal').fadeOut();
+                    location.reload(); // Перезагрузка страницы для отображения изменений
+                },
+                error: function (xhr, status, error) {
+                    console.error("An error occurred while updating the user:", error);
+                    alert('An error occurred while updating the user: ' + error);
+                }
+            });
+        });
+
+        // Обработчик события клика для кнопки удаления
+        $('.delete-btn').on('click', function () {
+            if (confirm('Вы точно хотите удалить пользователя?')) {
+                var userId = $(this).closest('tr').data('id'); // Получаем userId из атрибута data-id строки таблицы
+
+                console.log('Попытка удалить пользователя с идентификатором:', userId); // Отладочная информация
+
+                if (!userId) {
+                    console.error('Идентификатор пользователя не найден в атрибуте data');
+                    return;
+                }
+                var deleteUrl = '/users/api/user/delete/' + userId; // Формируем правильный URL с ID пользователя
+                console.log('Сгенерированный URL-адрес для удаления:', deleteUrl); // Отладочная информация
+                $.ajax({
+                    url: deleteUrl,
+                    method: 'DELETE',
+                    success: function () {
+                        console.log('Пользователь успешно удален');
+                        location.reload(); // Перезагрузка страницы для обновления данных
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("При удалении пользователя произошла ошибка:", error);
+                        alert('При удалении пользователя произошла ошибка: ' + error);
+                    }
+                });
+            }
+        });
+
+
+        $(document).ready(function () {
+            // Initialize DataTables for each table
+            $('#usersTable').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.10.21/i18n/Russian.json"
+                }
+            });
+            $('#rolesTable').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.10.21/i18n/Russian.json"
+                }
+            });
+            $('#keysTable').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.10.21/i18n/Russian.json"
+                }
+            });
+
+
+            // переключение table visibility on button click
+            $('#btnUsers').on('click', function () {
+                $('#usersTable').show();
+                $('#keysTable').hide();
+                $('#rolesTable').hide();
+            });
+
+            $('#btnRoles').on('click', function () {
+                $('#usersTable').hide();
+                $('#rolesTable').show();
+                $('#keysTable').hide();
+            });
+
+            $('#btnKeys').on('click', function () {
+                $('#usersTable').hide();
+                $('#rolesTable').hide();
+                $('#keysTable').show();
+            });
+
+
+            // показ таблицы users по дефолту
+            $('#usersTable').show();
+            $('#keysTable').hide();
+            $('#rolesTable').hide();
+
+        });
+        // закрыть модальное окно
+        $('.close').on('click', function () {
+            $('#userModal').hide();
+        });
+    });
+</script>
+</body>
+</html>

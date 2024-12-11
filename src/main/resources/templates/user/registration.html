@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--    <title>Document</title>-->
+    <link rel="stylesheet" href="../static/stylereg.css">
+
+</head>
+<body>
+<div class="container">
+    <h2>Регистрация</h2>
+    <form th:action="@{/users/api/save/users}" method="post" class="register-form"  th:object="${user}"  onsubmit="return validateForm()">
+
+        <label for="username">Логин:
+            <input id="username" type="text" name="username" th:value="*{username}">
+        </label><br>
+
+        <label for="age">Возраст:
+            <input id="age" type="number" name="age" th:value="*{age}">
+        </label><br>
+
+        <label for="lastname">Фамилия:
+            <input id="lastname" type="text" name="lastName" th:value="*{lastName}">
+        </label><br>
+
+        <label for="firstname">Имя:
+            <input id="firstname" type="text" name="firstName" th:value="*{firstName}">
+        </label><br>
+
+        <label for="phonenumber">Номер телефона:
+            <input id="phonenumber" type="text" name="phoneNumber" th:value="*{phoneNumber}">
+        </label><br>
+
+        <label for="address">Адресс:
+            <input id="address" type="text" name="address" th:value="*{address}">
+        </label><br>
+
+        <label for="middleName">Отчество:
+            <input id="middleName" type="text" name="middleName" th:value="*{middleName}">
+        </label><br>
+
+        <label for="email">Эл. почта:
+            <input id="email" type="text" name="email" th:value="*{email}">
+        </label><br>
+
+        <label for="password">Пароль:
+            <input id="password" type="text" name="password" th:value="*{password}">
+        </label><br>
+
+        <!--    <div th:each="role : ${roles}">-->
+        <!--        <input th:id="${role}" type="radio" name="role" th:value="${role}" th:checked="${role == user.role}">-->
+        <!--        <label th:for="${role}" th:text="${role} ">Role name</label>-->
+        <!--    </div>-->
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+</div>
+<script>
+    function validateForm() {
+        var username = document.getElementById("username").value;
+        var age = document.getElementById("age").value;
+        var lastname = document.getElementById("lastname").value;
+        var firstname = document.getElementById("firstname").value;
+        var phonenumber = document.getElementById("phonenumber").value;
+        var address = document.getElementById("address").value;
+        var middleName = document.getElementById("middleName").value;
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+
+        if (username === "" || age === "" || lastname === "" || firstname === "" || phonenumber === "" || address === "" || middleName === "" || email === "" || password === "") {
+            alert("Все поля должны быть заполнены");
+            return false;
+        }
+
+        if (!/^\d+$/.test(age) || age <= 0) {
+            alert("Возраст должен быть положительным числом");
+            return false;
+        }
+
+        if (!/^\+?[0-9]{10,15}$/.test(phonenumber)) {
+            alert("Номер телефона должен содержать только цифры и быть в формате от 10 до 15 цифр");
+            return false;
+        }
+
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            alert("Некорректный формат электронной почты");
+            return false;
+        }
+
+        if (password.length < 6) {
+            alert("Пароль должен быть не менее 6 символов");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+</body>
+</html>
