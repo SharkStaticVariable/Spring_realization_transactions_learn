@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Личный кабинет</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -49,15 +48,14 @@
             float: right;
         }
         #togglePassword {
-            background-size: 20px; /* Размер иконки */
-            background-repeat: no-repeat; /* Запрет повторения фона */
-            background-position: center; /* Позиция иконки в центре кнопки */
-            padding: 8px; /* Внутренние отступы для обеспечения места под иконку */
-            border: 1px solid #ccc; /* Граница */
-            border-radius: 4px; /* Закругление углов */
-            cursor: pointer; /* Изменение курсора при наведении */
+            background-size: 20px;
+            background-repeat: no-repeat;
+            background-position: center;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
         }
-        /* Custom CSS for the header fragment */
         .custom-header {
             background-color: #333;
             color: #df0e0e;
@@ -72,7 +70,7 @@
 <div class="container">
     <h2>Личный кабинет</h2>
 
-    <!-- Информация о пользователе и счет -->
+    <!-- Информация о пользователе -->
     <div class="card">
         <div class="card-header">
             Ваша информация
@@ -126,7 +124,6 @@
                 <button type="button" id="saveProfileBtn" class="btn btn-success right-float" style="display: none;">Сохранить</button>
             </form>
             <div th:insert="~{fragment::header}"></div>
-
         </div>
     </div>
 
@@ -196,6 +193,127 @@
     </div>
 </div>
 
+
+
+<!-- Секция для счета пользователя (по умолчанию скрыта) -->
+<div id="accountSection" class="card" style="display: none;">
+    <div class="card-header">
+        Информация о счете
+    </div>
+    <div class="card-body">
+        <!-- Здесь будет динамически отображаться номер счета и баланс -->
+        <p class="account-info">Номер счета: <span id="accountNumber"></span>, Баланс: <span id="accountBalance"></span></p>
+        <button id="depositBtn" class="btn btn-primary">Пополнить</button>
+        <button id="transferBtn" class="btn btn-warning">Перевести</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        const userId = new URLSearchParams(window.location.search).get('id'); // Получаем id пользователя из URL
+
+        // Отправляем запрос на получение информации о счете
+        $.ajax({
+            url: '/acc/api/account/' + userId,  // Путь на сервере для получения данных счета
+            method: 'GET',
+            success: function(response) {
+                // Данные получены успешно
+                $('#createAccountSection').hide();  // Скрываем кнопку создания счета
+                $('#accountSection').show();  // Показываем информацию о счете
+
+                // Заполняем информацию о счете
+                $('#accountNumber').text(response.accountNumber);  // Номер счета
+                $('#accountBalance').text(response.balance);       // Баланс счета
+            },
+            error: function(xhr, status, error) {
+                alert('Произошла ошибка при загрузке данных счета');
+            }
+        });
+
+        // Логика для кнопок "Пополнить" и "Перевести"
+        $('#depositBtn').on('click', function() {
+            alert('Открыта форма пополнения');
+        });
+
+        $('#transferBtn').on('click', function() {
+            alert('Открыта форма перевода');
+        });
+    });
+</script>
+
+    <!-- Модальное окно для пополнения счета -->
+    <div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="depositModalLabel">Пополнить счет</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="depositAmount">Сумма пополнения:</label>
+                        <input id="depositAmount" type="number" class="form-control" placeholder="Введите сумму">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" id="depositSubmitBtn" class="btn btn-primary">Пополнить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для перевода средств -->
+    <div class="modal fade" id="transferModal" tabindex="-1" role="dialog" aria-labelledby="transferModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transferModalLabel">Перевести средства</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="transferAmount">Сумма перевода:</label>
+                        <input id="transferAmount" type="number" class="form-control" placeholder="Введите сумму">
+                    </div>
+                    <div class="form-group">
+                        <label for="transferToAccount">Номер счета получателя:</label>
+                        <input id="transferToAccount" type="text" class="form-control" placeholder="Введите номер счета получателя">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" id="transferSubmitBtn" class="btn btn-warning">Перевести</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<button id="createAccountButton">Создать счет</button>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#createAccountButton').on('click', function() {
+            const userId = new URLSearchParams(window.location.search).get('id'); // Получаем id пользователя из URL
+
+            $.ajax({
+                url: '/acc/create/' + userId,  // Передаем userId в URL, как ожидает сервер
+                method: 'POST',  // Используем POST-запрос
+                success: function(response) {
+                    alert('Счет успешно создан!');
+                },
+                error: function(xhr, status, error) {
+                    alert('Произошла ошибка при создании счета');
+                }
+            });
+        });
+    });
+
+</script>
 <script>
     $(document).ready(function() {
         // Находим кнопку "Редактировать профиль" по ее идентификатору
@@ -231,7 +349,6 @@
                 icon.removeClass('fa-eye').addClass('fa-eye-slash');
             }
         });
-
         // Функция загрузки данных в модальное окно при клике на кнопку "Редактировать профиль"
         $('#editProfileBtn').click(function() {
             const userId = getParameterByName('userId');
@@ -352,18 +469,118 @@
             alert('userId не найден в URL');
         }
     });
+    $(document).ready(function() {
+        // Отображение и скрытие секций
+        if ($('#accountSection').length) {
+            $('#accountSection').show();
+            $('#createAccountSection').hide();
+        } else {
+            $('#accountSection').hide();
+            $('#createAccountSection').show();
+        }
+        // Функция чтобы доставать userId из URL
+        function getParameterByName(name) {
+            const url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+            const results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+        // Создание счета
+        $('#createAccountBtn').click(function() {
+            // Отправка запроса на сервер для создания счета
+            $.ajax({
+                url: '/accounts/create',
+                method: 'POST',
+                success: function(response) {
+                    $('#createAccountSection').hide();
+                    $('#accountSection').show();
+                    $('.account-info').text(`Номер счета: ${response.number}, Баланс: ${response.balance}`);
+                },
+                error: function(error) {
+                    console.error('Ошибка при создании счета', error);
+                    alert('Ошибка при создании счета');
+                }
+            });
+        });
 
-    // Функция чтобы доставать userId из URL
-    function getParameterByName(name) {
-        const url = window.location.href;
-        name = name.replace(/[\[\]]/g, '\\$&');
-        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-        const results = regex.exec(url);
-        if (!results) return null;
-        if (!results[2]) return '';
-        return decodeURIComponent(results[2].replace(/\+/g, ' '));
-    }
+        // Пополнение счета
+        $('#depositBtn').click(function() {
+            $('#depositModal').modal('show');
+        });
 
+        $('#depositSubmitBtn').click(function() {
+            var amount = $('#depositAmount').val();
+            $.ajax({
+                url: '/accounts/deposit',
+                method: 'POST',
+                data: { amount: amount },
+                success: function(response) {
+                    $('#depositModal').modal('hide');
+                    alert('Счет успешно пополнен');
+                    location.reload();
+                },
+                error: function(error) {
+                    console.error('Ошибка при пополнении счета', error);
+                    alert('Ошибка при пополнении счета');
+                }
+            });
+        });
+
+        // Перевод средств
+        $('#transferBtn').click(function() {
+            $('#transferModal').modal('show');
+        });
+
+        $('#transferSubmitBtn').click(function() {
+            var amount = $('#transferAmount').val();
+            var toAccount = $('#transferToAccount').val();
+            $.ajax({
+                url: '/accounts/transfer',
+                method: 'POST',
+                data: { amount: amount, toAccount: toAccount },
+                success: function(response) {
+                    $('#transferModal').modal('hide');
+                    alert('Перевод средств выполнен');
+                    location.reload();
+                },
+                error: function(error) {
+                    console.error('Ошибка при переводе средств', error);
+                    alert('Ошибка при переводе средств');
+                }
+            });
+        });
+
+        // Редактирование профиля
+        $('#editProfileBtn').click(function() {
+            $('#saveProfileBtn').show();
+            $('#editProfileBtn').hide();
+            $('input').prop('disabled', false);
+        });
+
+        $('#saveProfileBtn').click(function() {
+            var data = $('#userForm').serialize();
+            $.ajax({
+                url: '/users/edit',
+                method: 'POST',
+                data: data,
+                success: function(response) {
+                    alert('Профиль успешно обновлен');
+                    $('#saveProfileBtn').hide();
+                    $('#editProfileBtn').show();
+                    $('input').prop('disabled', true);
+                },
+                error: function(error) {
+                    console.error('Ошибка при сохранении профиля', error);
+                    alert('Ошибка при сохранении профиля');
+                }
+            });
+        });
+
+    });
 </script>
+
 </body>
 </html>

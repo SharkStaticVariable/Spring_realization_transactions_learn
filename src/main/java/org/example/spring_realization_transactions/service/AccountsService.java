@@ -5,6 +5,7 @@ import org.example.spring_realization_transactions.entity.AccountsEntity;
 import org.example.spring_realization_transactions.entity.UsersEntity;
 import org.example.spring_realization_transactions.repository.AccountsRepository;
 import org.example.spring_realization_transactions.repository.UsersRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,32 +20,32 @@ public class AccountsService {
     private final UsersRepository usersRepository;
 
 
-    public AccountsEntity createAccountForUser(UsersEntity user) {
-        // Создаем новый счет
+
+    public void createAccount(Integer userId) {
+        UsersEntity user = usersRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        // Создаем новый объект счета
         AccountsEntity account = new AccountsEntity();
-        account.setNumber(generateAccountNumber());
-        account.setBalance(new BigDecimal("0.00")); // Устанавливаем начальный баланс
-        account.setCreationDate(LocalDate.now()); // Устанавливаем текущую дату как дату создания счета
-        account.setUser(user); // Привязываем пользователя к счету
+        account.setBalance(BigDecimal.ZERO); // Начальный баланс = 0
+        account.setCreationDate(LocalDate.now()); // Дата создания = текущая дата
+        account.setNumber(generateAccountNumber()); // Генерируем номер счета
+        account.setUser(user); // Привязываем счет к пользователю
 
-        // Сохраняем созданный счет в базе данных
-        AccountsEntity savedAccount = accountsRepository.save(account);
-
-        // Обновляем пользователя, чтобы привязать ему ID счета
-        user.setAccountId(savedAccount.getId()); // Присваиваем ID счета пользователю
-        usersRepository.save(user); // Сохраняем обновленного пользователя
-
-        return savedAccount; // Возвращаем сохраненный счет
+        accountsRepository.save(account); // Сохраняем счет в базе данных
     }
 
-
-
-
-    // Генерация случайного номера счета
     private int generateAccountNumber() {
-        Random random = new Random();
-        return 100000 + random.nextInt(900000); // Генерация случайного числа от 100000 до 999999
+        // Пример генерации уникального номера счета (можно улучшить)
+        return (int) (Math.random() * 1000000);
     }
+
+    // Метод для получения счета по userId
+    public AccountsEntity getAccountByUserId(Integer userId) {
+        // Предполагаем, что счет связан с пользователем через поле userId
+        return accountsRepository.findByUserId(userId);  // Метод репозитория для поиска по userId
+    }
+
 
     // Сохранение счета
     public AccountsEntity save(AccountsEntity accountsEntity) {

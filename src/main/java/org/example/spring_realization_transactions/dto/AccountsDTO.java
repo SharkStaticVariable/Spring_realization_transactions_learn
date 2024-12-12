@@ -7,11 +7,11 @@ import java.time.LocalDate;
 
 @Data
 public class AccountsDTO {
-    private double balance;
-    private boolean isActive;
+    private BigDecimal balance;
+    private LocalDate creationDate;
     private int number;
 
-    public AccountsDTO(Integer id, BigDecimal balance, LocalDate number, int active) {
+    public AccountsDTO(Integer id, BigDecimal balance, LocalDate creationDate, int number ) {
     }
 
 }

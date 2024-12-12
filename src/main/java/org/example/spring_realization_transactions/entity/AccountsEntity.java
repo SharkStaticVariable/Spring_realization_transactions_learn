@@ -1,5 +1,6 @@
 package org.example.spring_realization_transactions.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,12 +29,14 @@ public class AccountsEntity {
     private int number;
 
 
+    @JsonBackReference
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private UsersEntity user;
 
-    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY) // Сторона обратной связи
-    private UsersEntity user; // Связь с пользователем
 
     // Конструкторы
-    public AccountsEntity(BigDecimal balance , int number) {
+    public AccountsEntity(BigDecimal balance , int number, LocalDate creationDate) {
         this.balance = balance;
         this.number = number;
     }

@@ -11,7 +11,14 @@ ALTER TABLE accounts
 
 
 ALTER TABLE accounts
+    ADD COLUMN user_id BIGINT,
+    ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+ALTER TABLE accounts
     add column number int ;
+
 ALTER TABLE accounts
     drop column isLocked  ;
 

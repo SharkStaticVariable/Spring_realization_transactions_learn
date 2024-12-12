@@ -2,74 +2,70 @@ package org.example.spring_realization_transactions.controllers;
 
 import lombok.AllArgsConstructor;
 import org.example.spring_realization_transactions.entity.AccountsEntity;
-import org.example.spring_realization_transactions.entity.UsersEntity;
 import org.example.spring_realization_transactions.service.AccountsService;
-import org.example.spring_realization_transactions.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @AllArgsConstructor
 @RequestMapping("/acc")
 public class AccountsController {
 
     private final AccountsService accountsService;
-    private final UserService userService;
 
+    // Обработка POST-запроса для создания счета
     @PostMapping("/create/{userId}")
-    public ResponseEntity<AccountsEntity> createAccount(@PathVariable Integer userId) {
-        // Получаем пользователя по его ID
-        UsersEntity user = userService.getUserById(userId);
-
-        // Проверяем, что пользователь существует
-        if (user == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<String> createAccount(@PathVariable("userId") Integer userId) {
+        try {
+            accountsService.createAccount(userId);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Счет успешно создан");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ошибка при создании счета: " + e.getMessage());
         }
-
-        // Проверяем, если у пользователя уже есть счет
-        if (user.getAccountId() != null) { // Если accountId не null, значит у пользователя уже есть счет
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null); // Можно вернуть ошибку 400, если счет уже существует
-        }
-
-        // Создаем счет для пользователя
-        AccountsEntity createdAccount = accountsService.createAccountForUser(user);
-
-        // Привязываем созданный счет к пользователю
-        user.setAccountId(createdAccount.getId());
-        userService.save(user);  // Сохраняем пользователя с обновленным account_id
-
-        return ResponseEntity.ok(createdAccount);
     }
 
+    // Получение счета по ID пользователя
+    @GetMapping("/api/account/{userId}")
+    public ResponseEntity<AccountsEntity> getAccountByUserId(@PathVariable Integer userId) {
+        AccountsEntity account = accountsService.getAccountByUserId(userId); // Ваш сервис для получения счета
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Если счет не найден
+        }
+        return ResponseEntity.ok(account); // Возвращаем найденный счет
+    }
 
+    // Получение списка всех счетов
     @GetMapping("/api/accounts")
-    public ResponseEntity<List<AccountsEntity>> readAll() {
-        return new ResponseEntity<>(accountsService.readAll(), HttpStatus.OK);
+    public ResponseEntity<List<AccountsEntity>> getAllAccounts() {
+        List<AccountsEntity> accounts = accountsService.readAll(); // Ваш сервис для получения списка счетов
+        return ResponseEntity.ok(accounts); // Возвращаем список счетов
     }
 
-    @GetMapping("/welcome")
-    public String welcome() {
-        return "Welcome to the unprotected page";
-    }
-
+    // Сохранение нового счета
     @PostMapping("/api/save")
-    public ResponseEntity<AccountsEntity> save(@RequestBody AccountsEntity accountsEntity) {
-        return new ResponseEntity<>(accountsService.save(accountsEntity), HttpStatus.OK);
+    public ResponseEntity<AccountsEntity> saveAccount(@RequestBody AccountsEntity accountsEntity) {
+        AccountsEntity savedAccount = accountsService.save(accountsEntity); // Сохраняем счет через сервис
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAccount); // Возвращаем сохраненный счет
     }
 
+    // Обновление существующего счета
     @PutMapping("/api/put")
-    public ResponseEntity<AccountsEntity> update(@RequestBody AccountsEntity accountsEntity) {
-        return new ResponseEntity<>(accountsService.update(accountsEntity), HttpStatus.OK);
+    public ResponseEntity<AccountsEntity> updateAccount(@RequestBody AccountsEntity accountsEntity) {
+        AccountsEntity updatedAccount = accountsService.update(accountsEntity); // Обновляем счет через сервис
+        return ResponseEntity.ok(updatedAccount); // Возвращаем обновленный счет
     }
 
+    // Удаление счета
     @DeleteMapping("/api/delete/{id}")
-    public HttpStatus delete(@PathVariable Integer id) {
-        accountsService.delete(id);
-        return HttpStatus.OK;
+    public ResponseEntity<String> deleteAccount(@PathVariable Integer id) {
+        try {
+            accountsService.delete(id); // Удаляем счет через сервис
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Счет успешно удален");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ошибка при удалении счета: " + e.getMessage());
+        }
     }
 }

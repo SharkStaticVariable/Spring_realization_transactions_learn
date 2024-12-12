@@ -1,5 +1,6 @@
 package org.example.spring_realization_transactions.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,11 +50,9 @@ public class UsersEntity {
     private RolesEntity roles;
 
 
-
-    @OneToOne(fetch = FetchType.LAZY) // Связь с аккаунтом
-    @JoinColumn(name = "account_id", referencedColumnName = "id") // Внешний ключ
-    private AccountsEntity account; // Связь с аккаунтом
-
+    @JsonManagedReference
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private AccountsEntity account;
 
     public void setAccountId(Integer id) {
     }
@@ -61,7 +60,4 @@ public class UsersEntity {
     public Integer getAccountId() {
         return this.id;
     }
-
-
-
 }

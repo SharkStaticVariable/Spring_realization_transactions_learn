@@ -9,6 +9,7 @@ import org.example.spring_realization_transactions.entity.RolesEntity;
 @NoArgsConstructor
 @Builder
 public class UserDto {
+
     String username;
     String firstName;
     String lastName;
@@ -20,7 +21,7 @@ public class UserDto {
     String password;
     RolesEntity roles;
 
-    public UserDto(String username, String firstName, String lastName, int age, String phoneNumber, String address, String middleName, String email, String password,  RolesEntity roles) {
+    public UserDto( String username, String firstName, String lastName, int age, String phoneNumber, String address, String middleName, String email, String password,  RolesEntity roles) {
     }
 
     public String getUsername() {
