@@ -56,7 +56,25 @@ public class AccountsController {
     }
 
 
+    // Эндпоинт для проверки счета
+    @PostMapping("/check/{userId}")
+    public ResponseEntity<String> checkAccount(@PathVariable Integer userId) {
+        try {
+            // Проверяем, существует ли счет для пользователя
+            boolean accountExists = accountsService.checkAccountExists(userId);
 
+            if (accountExists) {
+                return ResponseEntity.ok("Счет существует");
+            } else {
+                return ResponseEntity.ok("Счет не существует");
+            }
+
+        } catch (Exception e) {
+            // В случае ошибки возвращаем сообщение об ошибке
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при проверке счета: " + e.getMessage());
+        }
+    }
 
 
 

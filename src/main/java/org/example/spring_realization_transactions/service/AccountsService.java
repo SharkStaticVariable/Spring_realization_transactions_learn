@@ -54,7 +54,10 @@ public class AccountsService {
     }
 
 
-
+    public boolean checkAccountExists(Integer userId) {
+        // Проверяем, существует ли счет для данного пользователя
+        return accountsRepository.existsByUserId(userId);
+    }
 
 
 

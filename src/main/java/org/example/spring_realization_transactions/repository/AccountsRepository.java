@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccountsRepository extends JpaRepository<AccountsEntity, Integer> {
     AccountsEntity findByUserId(Integer userId);
-
+    boolean existsByUserId(Integer userId);
 }

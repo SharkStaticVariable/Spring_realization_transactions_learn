@@ -208,39 +208,6 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function() {
-        const userId = new URLSearchParams(window.location.search).get('id'); // Получаем id пользователя из URL
-
-        // Отправляем запрос на получение информации о счете
-        $.ajax({
-            url: '/acc/api/account/' + userId,  // Путь на сервере для получения данных счета
-            method: 'GET',
-            success: function(response) {
-                // Данные получены успешно
-                $('#createAccountSection').hide();  // Скрываем кнопку создания счета
-                $('#accountSection').show();  // Показываем информацию о счете
-
-                // Заполняем информацию о счете
-                $('#accountNumber').text(response.accountNumber);  // Номер счета
-                $('#accountBalance').text(response.balance);       // Баланс счета
-            },
-            error: function(xhr, status, error) {
-                alert('Произошла ошибка при загрузке данных счета');
-            }
-        });
-
-        // Логика для кнопок "Пополнить" и "Перевести"
-        $('#depositBtn').on('click', function() {
-            alert('Открыта форма пополнения');
-        });
-
-        $('#transferBtn').on('click', function() {
-            alert('Открыта форма перевода');
-        });
-    });
-</script>
-
     <!-- Модальное окно для пополнения счета -->
     <div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -294,27 +261,43 @@
     </div>
 
 <button id="createAccountButton">Создать счет</button>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#createAccountButton').on('click', function() {
-            const userId = new URLSearchParams(window.location.search).get('id'); // Получаем id пользователя из URL
 
-            $.ajax({
-                url: '/acc/create/' + userId,  // Передаем userId в URL, как ожидает сервер
-                method: 'POST',  // Используем POST-запрос
-                success: function(response) {
-                    alert('Счет успешно создан!');
-                },
-                error: function(xhr, status, error) {
-                    alert('Произошла ошибка при создании счета');
-                }
-            });
+
+<script>
+
+    $(document).ready(function() {
+        const userId = getParameterByName('userId');
+
+        // Отправляем запрос на получение информации о счете
+        $.ajax({
+            url: '/acc/api/account/' + userId,  // Путь на сервере для получения данных счета
+            method: 'GET',
+            success: function(response) {
+                // Данные получены успешно
+                $('#createAccountSection').hide();  // Скрываем кнопку создания счета
+                $('#accountSection').show();  // Показываем информацию о счете
+
+                // Заполняем информацию о счете
+                $('#accountNumber').text(response.accountNumber);  // Номер счета
+                $('#accountBalance').text(response.balance);       // Баланс счета
+            },
+            error: function(xhr, status, error) {
+                alert('Произошла ошибка при загрузке данных счета');
+            }
+        });
+
+        // Логика для кнопок "Пополнить" и "Перевести"
+        $('#depositBtn').on('click', function() {
+            alert('Открыта форма пополнения');
+        });
+
+        $('#transferBtn').on('click', function() {
+            alert('Открыта форма перевода');
         });
     });
 
-</script>
-<script>
+
+
     $(document).ready(function() {
         // Находим кнопку "Редактировать профиль" по ее идентификатору
         $('#editProfileBtn').click(function () {
@@ -349,6 +332,8 @@
                 icon.removeClass('fa-eye').addClass('fa-eye-slash');
             }
         });
+
+
         // Функция загрузки данных в модальное окно при клике на кнопку "Редактировать профиль"
         $('#editProfileBtn').click(function() {
             const userId = getParameterByName('userId');
@@ -469,6 +454,8 @@
             alert('userId не найден в URL');
         }
     });
+
+
     $(document).ready(function() {
         // Отображение и скрытие секций
         if ($('#accountSection').length) {
@@ -478,80 +465,7 @@
             $('#accountSection').hide();
             $('#createAccountSection').show();
         }
-        // Функция чтобы доставать userId из URL
-        function getParameterByName(name) {
-            const url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-            const results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-        // Создание счета
-        $('#createAccountBtn').click(function() {
-            // Отправка запроса на сервер для создания счета
-            $.ajax({
-                url: '/accounts/create',
-                method: 'POST',
-                success: function(response) {
-                    $('#createAccountSection').hide();
-                    $('#accountSection').show();
-                    $('.account-info').text(`Номер счета: ${response.number}, Баланс: ${response.balance}`);
-                },
-                error: function(error) {
-                    console.error('Ошибка при создании счета', error);
-                    alert('Ошибка при создании счета');
-                }
-            });
-        });
 
-        // Пополнение счета
-        $('#depositBtn').click(function() {
-            $('#depositModal').modal('show');
-        });
-
-        $('#depositSubmitBtn').click(function() {
-            var amount = $('#depositAmount').val();
-            $.ajax({
-                url: '/accounts/deposit',
-                method: 'POST',
-                data: { amount: amount },
-                success: function(response) {
-                    $('#depositModal').modal('hide');
-                    alert('Счет успешно пополнен');
-                    location.reload();
-                },
-                error: function(error) {
-                    console.error('Ошибка при пополнении счета', error);
-                    alert('Ошибка при пополнении счета');
-                }
-            });
-        });
-
-        // Перевод средств
-        $('#transferBtn').click(function() {
-            $('#transferModal').modal('show');
-        });
-
-        $('#transferSubmitBtn').click(function() {
-            var amount = $('#transferAmount').val();
-            var toAccount = $('#transferToAccount').val();
-            $.ajax({
-                url: '/accounts/transfer',
-                method: 'POST',
-                data: { amount: amount, toAccount: toAccount },
-                success: function(response) {
-                    $('#transferModal').modal('hide');
-                    alert('Перевод средств выполнен');
-                    location.reload();
-                },
-                error: function(error) {
-                    console.error('Ошибка при переводе средств', error);
-                    alert('Ошибка при переводе средств');
-                }
-            });
-        });
 
         // Редактирование профиля
         $('#editProfileBtn').click(function() {
@@ -580,7 +494,98 @@
         });
 
     });
-</script>
 
+
+    // Функция чтобы доставать userId из URL
+    function getParameterByName(name) {
+        const url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+
+
+    function checkAccountExists(userId) {
+        return fetch(`/acc/check/${userId}`, { method: 'POST' })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(err => {
+                        throw new Error(err || `Ошибка при проверке наличия счета: ${response.statusText}`);
+                    });
+                }
+                // Проверяем, если сервер вернул строку
+                return response.text().then(data => {
+                    // Преобразуем строку в булево значение
+                    if (data === "Счет существует") {
+                        return true;
+                    } else if (data === "Счет не существует") {
+                        return false;
+                    } else {
+                        throw new Error("Неизвестный ответ от сервера");
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка при проверке наличия счета:', error);
+                throw new Error('Не удалось проверить наличие счета: ' + error.message);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const createAccountButton = document.getElementById('createAccountButton');
+        const userId = getParameterByName('userId');
+
+        if (!userId) {
+            alert('Параметр userId отсутствует в URL');
+            createAccountButton.style.display = 'none'; // Скрываем кнопку
+            return;
+        }
+
+        // Проверяем наличие счета у пользователя
+        checkAccountExists(userId)
+            .then(accountExists => {
+                if (accountExists) {
+                    // Если счет уже существует, скрываем кнопку
+                    createAccountButton.style.display = 'none';
+                } else {
+                    // Добавляем обработчик события "click", если кнопка доступна
+                    createAccountButton.addEventListener('click', () => {
+                        fetch(`/acc/create/${userId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.json().then(err => {
+                                        throw new Error(err.message || `Ошибка: ${response.statusText}`);
+                                    });
+                                }
+                                return response.text();
+                            })
+                            .then(data => {
+                                console.log('Ответ от сервера:', data);
+                                alert(data); // Уведомление о результате
+                                // После успешного создания счета скрываем кнопку
+                                createAccountButton.style.display = 'none';
+                            })
+                            .catch(error => {
+                                console.error('Ошибка при выполнении запроса:', error);
+                                alert('Ошибка: ' + error.message);
+                            });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при проверке счета:', error);
+                alert('Ошибка при проверке наличия счета: ' + error.message);
+            });
+    });
+</script>
 </body>
 </html>
