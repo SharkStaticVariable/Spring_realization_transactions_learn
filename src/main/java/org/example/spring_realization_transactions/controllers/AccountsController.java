@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -37,13 +38,37 @@ public class AccountsController {
         return ResponseEntity.ok(account); // Возвращаем найденный счет
     }
 
+
+
+
+
+
+    @PostMapping("/{accountId}/deposit")
+    public String deposit(@PathVariable Integer accountId, @RequestParam BigDecimal amount) {
+        accountsService.deposit(accountId, amount);
+        return "Deposit successful.";
+    }
+
+    @PostMapping("/{sourceAccountId}/transfer")
+    public String transfer(@PathVariable Integer sourceAccountId, @RequestParam Integer targetAccountId, @RequestParam BigDecimal amount) {
+        accountsService.transfer(sourceAccountId, targetAccountId, amount);
+        return "Transfer successful.";
+    }
+
+
+
+
+
+
+
+
+
     // Получение списка всех счетов
     @GetMapping("/api/accounts")
     public ResponseEntity<List<AccountsEntity>> getAllAccounts() {
         List<AccountsEntity> accounts = accountsService.readAll(); // Ваш сервис для получения списка счетов
         return ResponseEntity.ok(accounts); // Возвращаем список счетов
     }
-
     // Сохранение нового счета
     @PostMapping("/api/save")
     public ResponseEntity<AccountsEntity> saveAccount(@RequestBody AccountsEntity accountsEntity) {

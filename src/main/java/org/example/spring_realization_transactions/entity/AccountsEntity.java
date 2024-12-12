@@ -8,6 +8,7 @@ import org.apache.poi.hpsf.Decimal;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -28,12 +29,33 @@ public class AccountsEntity {
     @Column(name="number")
     private int number;
 
+    @OneToMany(mappedBy = "senderAccount", cascade = CascadeType.ALL)
+    private Set<TransactionsEntity> sentTransactions;
+
+    @OneToMany(mappedBy = "receiverAccount", cascade = CascadeType.ALL)
+    private Set<TransactionsEntity> receivedTransactions;
 
     @JsonBackReference
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private UsersEntity user;
 
+
+    public Set<TransactionsEntity> getSentTransactions() {
+        return sentTransactions;
+    }
+
+    public void setSentTransactions(Set<TransactionsEntity> sentTransactions) {
+        this.sentTransactions = sentTransactions;
+    }
+
+    public Set<TransactionsEntity> getReceivedTransactions() {
+        return receivedTransactions;
+    }
+
+    public void setReceivedTransactions(Set<TransactionsEntity> receivedTransactions) {
+        this.receivedTransactions = receivedTransactions;
+    }
 
     // Конструкторы
     public AccountsEntity(BigDecimal balance , int number, LocalDate creationDate) {

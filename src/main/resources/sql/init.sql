@@ -93,3 +93,41 @@ ALTER TABLE users ALTER COLUMN address TYPE VARCHAR(500); -- Adjust the length a
 ALTER TABLE users ALTER COLUMN username TYPE VARCHAR(512);
 
 ALTER TABLE users ALTER COLUMN password TYPE VARCHAR(4096);
+
+
+-- Создание таблицы transactions
+CREATE TABLE IF NOT EXISTS  transactions (
+                              id SERIAL PRIMARY KEY,                    -- Уникальный идентификатор транзакции
+                              sender_account_id BIGINT NOT NULL,           -- Идентификатор счёта отправителя
+                              receiver_account_id BIGINT NOT NULL,         -- Идентификатор счёта получателя
+                              amount DECIMAL(15, 2) NOT NULL CHECK (amount > 0),  -- Сумма транзакции
+                              type VARCHAR(50) NOT NULL,                  -- Тип транзакции (например, 'DEPOSIT', 'TRANSFER')
+                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Дата и время создания транзакции
+                              description TEXT,                           -- Описание транзакции
+
+    -- Связи с таблицей accounts
+                              CONSTRAINT fk_sender_account FOREIGN KEY (sender_account_id) REFERENCES accounts (id) ON DELETE SET NULL,
+                              CONSTRAINT fk_receiver_account FOREIGN KEY (receiver_account_id) REFERENCES accounts (id) ON DELETE SET NULL
+);
+
+-- Создание таблицы transactions_log
+CREATE TABLE IF NOT EXISTS transactions_log (
+                                  id SERIAL PRIMARY KEY,                   -- Уникальный идентификатор записи лога
+                                  transaction_id BIGINT NOT NULL,             -- Идентификатор связанной транзакции
+                                  details TEXT NOT NULL,                      -- Детали лога
+                                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Дата и время записи
+
+    -- Связь с таблицей transactions
+                                  CONSTRAINT fk_transaction FOREIGN KEY (transaction_id) REFERENCES transactions (id) ON DELETE CASCADE
+);
+
+
+SELECT setval('public.transactions_id_seq', 1, false);
+
+DELETE FROM transactions WHERE id = 10;
+
+SELECT pg_get_serial_sequence('transactions', 'id');
+
+ALTER SEQUENCE public.transactions_id_seq RESTART WITH 1;
+SELECT last_value FROM transactions_id_seq;
+ALTER SEQUENCE transactions_id_seq RESTART WITH 1;
